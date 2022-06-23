@@ -16,8 +16,13 @@ def get_token(domain):
         json={"maxresults": 10000, "media": 0, "target": 1, "term": domain, "terminate": [None], "timeout": 20}
     if args.links:
         json={"maxresults": 10000, "media": 0, "target": 3, "term": domain, "terminate": [None], "timeout": 20}
-    key = requests.post(url, headers=headers, json=json).text
-    return key
+    response = requests.post(url, headers=headers, json=json)
+    key = response.text
+    status = response.status_code
+    if status == 402:
+        exit('[-] Your IP is rate limited. Try switching your IP address then re-run.')
+    else:
+        return key
 
 def make_request(key):
     key = json.loads(key)['id']
@@ -27,10 +32,15 @@ def make_request(key):
         "Accept": "*/*", "Accept-Language": "en-US,en;q=0.5", "Accept-Encoding": "gzip, deflate",
         "Origin": "https://phonebook.cz", "Dnt": "1", "Referer": "https://phonebook.cz/", "Sec-Fetch-Dest": "empty",
         "Sec-Fetch-Mode": "cors", "Sec-Fetch-Site": "cross-site", "Te": "trailers"}
-    emails = requests.get(url, headers=headers).text
-    return emails
+    response = requests.get(url, headers=headers)
+    items = response.text
+    status = response.status_code
+    if status == 402:
+        exit('[-] Your IP is rate limited. Try switching your IP address then re-run.')
+    else:
+        return items
 
-def parse_emails(items):
+def parse_items(items):
     file = open(args.phonebook_cz + '_cz.txt', 'a')
     items = json.loads(items)['selectors']
     for item in items:
@@ -38,18 +48,21 @@ def parse_emails(items):
         print(item)
         file.write(item)
         file.write('\n')
-
+    if args.phonebook_cz:
+        print(f'\n[+] Done! Saved to to ' + args.phonebook_cz + '_cz.txt')
+    else: print(f'\n[+] Done!')
 
 def argparser():
-    parser = argparse.ArgumentParser(description="A Phonebook.cz scraper.")
+    parser = argparse.ArgumentParser(description="Phonebook.cz scraper")
     parser.add_argument("-e", "--email", help="Search all emails for this domain.")
     parser.add_argument("-d", "--domain", help="Search all subdomains for this domain.")
     parser.add_argument("-l", "--links", help="Search all links for this domain.")
-    parser.add_argument('-o', "--outfile", action='store', dest='phonebook_cz', nargs='?', const='phonebook',
+    parser.add_argument('-o', action='store', dest='phonebook_cz', nargs='?', const='phonebook', default='phonebook',
                         help='Stores all items in file *_cz.txt')
     return parser.parse_args()
 
 if __name__ == '__main__':
+    print('[+] Running phonebook.cz scraper!\n')
     args = argparser()
     if args.email:
         key = get_token(args.email)
@@ -58,4 +71,4 @@ if __name__ == '__main__':
     if args.links:
         key = get_token(args.links)
     emails = make_request(key)
-    parse_emails(emails)
+    parse_items(emails)
