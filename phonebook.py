@@ -4,7 +4,7 @@ import argparse
 import os
 
 def get_token(domain):
-    url = "https://public.intelx.io:443/phonebook/search?k=077424c6-7a26-410e-9269-c9ac546886a4"
+    url = f"https://2.intelx.io:443/phonebook/search?k={token}"
     headers = {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:101.0) Gecko/20100101 Firefox/101.0",
                      "Accept": "*/*", "Accept-Language": "en-US,en;q=0.5", "Accept-Encoding": "gzip, deflate",
                      "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8", "Origin": "https://phonebook.cz",
@@ -18,6 +18,7 @@ def get_token(domain):
         json={"maxresults": 10000, "media": 0, "target": 3, "term": domain, "terminate": [None], "timeout": 20}
     response = requests.post(url, headers=headers, json=json)
     key = response.text
+    # key = "570db9cc-8781-458a-b667-06cc99faab01"
     status = response.status_code
     if status == 402:
         exit('[-] Your IP is rate limited. Try switching your IP address then re-run.')
@@ -26,7 +27,7 @@ def get_token(domain):
 
 def make_request(key):
     key = json.loads(key)['id']
-    url = f"https://public.intelx.io:443/phonebook/search/result?k=077424c6-7a26-410e-9269-c9ac546886a4&id={key}&limit=1000000"
+    url = f"https://2.intelx.io:443/phonebook/search/result?k={token}&id={key}&limit=1000000"
     headers = {
         "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:101.0) Gecko/20100101 Firefox/101.0",
         "Accept": "*/*", "Accept-Language": "en-US,en;q=0.5", "Accept-Encoding": "gzip, deflate",
@@ -63,6 +64,7 @@ def argparser():
 
 if __name__ == '__main__':
     print('[+] Running phonebook.cz scraper!\n')
+    token = "" # Hardcode this token from their site after going through the new signup process
     args = argparser()
     if args.email:
         key = get_token(args.email)
