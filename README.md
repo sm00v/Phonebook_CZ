@@ -1,6 +1,13 @@
 # Phonebook.cz Scraper
 <b>phonebook.py</b> is a  <a href="https://phonebook.cz">phonebook.cz</a> scraper tool which queries the phonebook.cz search engine and scrapes all items from page.
 
+## Update 4/27/23
+When you visit the site now you will see this note:
+
+![image](https://user-images.githubusercontent.com/34954477/235016173-6fcfb85d-f7d6-490e-a763-9e843ad0b589.png)
+
+You now need to auth to intelx.io then grab the auto token from the http response. Insert that into this tool and you will be able to scrape again!
+
 ## phonebook.py usage:
 ```
 usage: phonebook.py [-h] [-e EMAIL] [-d DOMAIN] [-l LINKS] [-o [PHONEBOOK_CZ]]
